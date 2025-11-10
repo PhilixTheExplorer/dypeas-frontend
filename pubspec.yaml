@@ -1,0 +1,46 @@
+name: waste_sorting_mvp
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  flutter_svg: ^2.0.10+1
+  image_picker: ^1.1.0
+  camera: ^0.11.2
+  provider: ^6.1.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icons/logos/
+    - assets/icons/bins/
+
+  # fonts:
+  #   - family: Kaisei Decol
+  #     fonts:
+  #       - asset: assets/fonts/KaiseiDecol-Regular.ttf
+  #   - family: Livvic
+  #     fonts:
+  #       - asset: assets/fonts/Livvic-Bold.ttf
+  #         weight: 700
+  #       - asset: assets/fonts/Livvic-SemiBold.ttf
+  #         weight: 600
+  #   - family: Kanit
+  #     fonts:
+  #       - asset: assets/fonts/Kanit-Regular.ttf
+  #       - asset: assets/fonts/Kanit-Bold.ttf
+  #         weight: 700
