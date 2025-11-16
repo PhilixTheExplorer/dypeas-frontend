@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'screens/loading_screen.dart';
 
 void main() {
-  runApp(const WasteSortingMVP());
+  runApp(const WasteWise());
 }
 
-class WasteSortingMVP extends StatelessWidget {
-  const WasteSortingMVP({super.key});
-
+class WasteWise extends StatelessWidget {
+  const WasteWise({super.key});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

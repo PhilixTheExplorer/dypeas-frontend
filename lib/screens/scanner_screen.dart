@@ -19,6 +19,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
   bool _isCameraInitialized = false;
   late final RoboflowService _roboflowService;
   bool _isClassifying = false;
+  bool _isProcessingCapture = false;
 
   @override
   void initState() {
@@ -91,7 +92,16 @@ class _ScannerScreenState extends State<ScannerScreen> {
       return;
     }
 
+    if (_isProcessingCapture) {
+      return;
+    }
+
+    setState(() {
+      _isProcessingCapture = true;
+    });
+
     try {
+      await _cameraController?.pausePreview();
       final XFile photo = await _cameraController!.takePicture();
 
       // Run the Roboflow model against the captured image
@@ -103,7 +113,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
       if (identifiedType != null) {
         // Success - show result
-        Navigator.push(
+        await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => ResultSuccessScreen(
@@ -114,7 +124,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
         );
       } else {
         // Error - couldn't identify
-        Navigator.push(
+        await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => ResultErrorScreen(imagePath: photo.path),
@@ -123,48 +133,72 @@ class _ScannerScreenState extends State<ScannerScreen> {
       }
     } catch (e) {
       debugPrint('Error capturing image: $e');
+    } finally {
+      await _cameraController?.resumePreview();
+      if (mounted) {
+        setState(() {
+          _isProcessingCapture = false;
+        });
+      } else {
+        _isProcessingCapture = false;
+      }
     }
   }
 
   Future<void> _pickFromGallery() async {
+    if (_isProcessingCapture || _isClassifying) {
+      return;
+    }
+
     try {
       final XFile? image = await _picker.pickImage(
         source: ImageSource.gallery,
         imageQuality: 85,
       );
 
-      if (image != null) {
-        debugPrint('Image picked: ${image.path}');
-
-        // Run the Roboflow model against the gallery image
-        String? identifiedType = await _identifyTrash(image.path);
-
-        if (!mounted) {
-          return;
-        }
-
-        if (identifiedType != null) {
-          // Success - show result
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ResultSuccessScreen(
-                imagePath: image.path,
-                wasteType: identifiedType,
-              ),
-            ),
-          );
-        } else {
-          // Error - couldn't identify
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ResultErrorScreen(imagePath: image.path),
-            ),
-          );
-        }
-      } else {
+      if (image == null) {
         debugPrint('No image selected');
+        return;
+      }
+
+      debugPrint('Image picked: ${image.path}');
+
+      if (mounted) {
+        setState(() {
+          _isProcessingCapture = true;
+        });
+      } else {
+        _isProcessingCapture = true;
+      }
+
+      await _cameraController?.pausePreview();
+
+      // Run the Roboflow model against the gallery image
+      String? identifiedType = await _identifyTrash(image.path);
+
+      if (!mounted) {
+        return;
+      }
+
+      if (identifiedType != null) {
+        // Success - show result
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ResultSuccessScreen(
+              imagePath: image.path,
+              wasteType: identifiedType,
+            ),
+          ),
+        );
+      } else {
+        // Error - couldn't identify
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ResultErrorScreen(imagePath: image.path),
+          ),
+        );
       }
     } catch (e) {
       debugPrint('Error picking image: $e');
@@ -181,6 +215,22 @@ class _ScannerScreenState extends State<ScannerScreen> {
             duration: const Duration(seconds: 3),
           ),
         );
+      }
+    } finally {
+      if (_isProcessingCapture) {
+        try {
+          await _cameraController?.resumePreview();
+        } catch (e) {
+          debugPrint('Error resuming preview after gallery pick: $e');
+        }
+
+        if (mounted) {
+          setState(() {
+            _isProcessingCapture = false;
+          });
+        } else {
+          _isProcessingCapture = false;
+        }
       }
     }
   }

@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:waste_sorting_mvp/main.dart';
+import 'package:waste_wise/main.dart';
 
 void main() {
   testWidgets('Loading screen displays correctly', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const WasteSortingMVP());
+    await tester.pumpWidget(const WasteWise());
 
     // Verify that the loading screen shows WasteWise title
     expect(find.text('WasteWise'), findsOneWidget);
