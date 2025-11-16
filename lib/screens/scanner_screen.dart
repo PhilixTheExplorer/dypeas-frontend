@@ -3,7 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:camera/camera.dart';
 import './result_success_screen.dart';
 import './result_error_screen.dart';
-import 'dart:math';
+import '../services/roboflow_service.dart';
 
 class ScannerScreen extends StatefulWidget {
   const ScannerScreen({Key? key}) : super(key: key);
@@ -17,11 +17,13 @@ class _ScannerScreenState extends State<ScannerScreen> {
   CameraController? _cameraController;
   List<CameraDescription>? _cameras;
   bool _isCameraInitialized = false;
-  String? _cameraError;
+  late final RoboflowService _roboflowService;
+  bool _isClassifying = false;
 
   @override
   void initState() {
     super.initState();
+    _roboflowService = RoboflowService();
     _initializeCamera();
   }
 
@@ -51,30 +53,38 @@ class _ScannerScreenState extends State<ScannerScreen> {
   @override
   void dispose() {
     _cameraController?.dispose();
+    _roboflowService.dispose();
     super.dispose();
   }
 
-  // Future<String?> _identifyTrash(String imagePath) async {
-  //   // This is where you'll integrate your AI model
-  //   // For testing, you can randomly return types or null
-  //   await Future.delayed(const Duration(seconds: 1));
-
-  //   // Simulate identification (replace with real AI later)
-  //   return 'compostable'; // or return null for error
-  // }
-
   Future<String?> _identifyTrash(String imagePath) async {
-    await Future.delayed(const Duration(seconds: 1));
-  
-    // 70% success rate, 30% error rate
-    if (Random().nextInt(100) < 30) {
-      return null; // Error - 30% chance
+    if (mounted) {
+      setState(() {
+        _isClassifying = true;
+      });
     }
-  
-  // Success - randomly return different waste types
-  List<String> wasteTypes = ['compostable', 'recyclable', 'general', 'hazardous'];
-  return wasteTypes[Random().nextInt(wasteTypes.length)];
-}
+
+    try {
+      final result = await _roboflowService.classifyImage(imagePath);
+      if (result == null) {
+        return null;
+      }
+      return result.wasteType ?? result.label;
+    } on MissingRoboflowConfigException catch (e) {
+      _showError(e.message);
+    } on RoboflowException catch (e) {
+      _showError(e.message);
+    } catch (e) {
+      _showError('Failed to classify waste. Please try again.');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isClassifying = false;
+        });
+      }
+    }
+    return null;
+  }
 
   Future<void> _captureImage() async {
     if (_cameraController == null || !_cameraController!.value.isInitialized) {
@@ -84,8 +94,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
     try {
       final XFile photo = await _cameraController!.takePicture();
 
-      // TODO: Call your AI/ML model to identify the trash
-      // For now, let's simulate:
+      // Run the Roboflow model against the captured image
       String? identifiedType = await _identifyTrash(photo.path);
 
       if (identifiedType != null) {
@@ -123,7 +132,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
       if (image != null) {
         print('Image picked: ${image.path}');
 
-        // TODO: Call your AI/ML model to identify the trash
+        // Run the Roboflow model against the gallery image
         String? identifiedType = await _identifyTrash(image.path);
 
         if (identifiedType != null) {
@@ -168,190 +177,224 @@ class _ScannerScreenState extends State<ScannerScreen> {
     }
   }
 
+  void _showError(String message) {
+    if (!mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, style: const TextStyle(fontFamily: 'Kanit')),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/loading_screen_bg.png'),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              // Header
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Text(
-                      'Trash-Scanner',
-                      style: TextStyle(
-                        fontFamily: 'Livvic',
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF024F3B),
-                      ),
-                    ),
-                  ],
-                ),
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/loading_screen_bg.png'),
+                fit: BoxFit.cover,
               ),
-
-              const SizedBox(height: 20),
-
-              // Camera viewfinder area
-              Expanded(
-                child: Center(
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 24),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF484C52).withOpacity(0.3),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: const Color(0xFF54AF75),
-                        width: 3,
-                      ),
-                    ),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        // Camera preview
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(17),
-                          child:
-                              _isCameraInitialized && _cameraController != null
-                              ? CameraPreview(_cameraController!)
-                              : Container(
-                                  color: Colors.black.withOpacity(0.1),
-                                  child: const Center(
-                                    child: CircularProgressIndicator(
-                                      color: Color(0xFF54AF75),
-                                    ),
-                                  ),
-                                ),
-                        ),
-
-                        // Corner markers
-                        Positioned(
-                          top: 20,
-                          left: 20,
-                          child: _CornerMarker(isTopLeft: true),
-                        ),
-                        Positioned(
-                          top: 20,
-                          right: 20,
-                          child: _CornerMarker(isTopRight: true),
-                        ),
-                        Positioned(
-                          bottom: 20,
-                          left: 20,
-                          child: _CornerMarker(isBottomLeft: true),
-                        ),
-                        Positioned(
-                          bottom: 20,
-                          right: 20,
-                          child: _CornerMarker(isBottomRight: true),
-                        ),
-
-                        // Instruction text
-                        Positioned(
-                          bottom: 60,
-                          left: 30,
-                          right: 30,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 12,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.95),
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                            child: const Text(
-                              'Point your camera at the trash and capture it.',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontFamily: 'Kanit',
-                                fontSize: 14,
-                                color: Color(0xFF024F3B),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
+            ),
+            child: SafeArea(
+              child: Column(
+                children: [
+                  // Header
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Text(
+                          'Trash-Scanner',
+                          style: TextStyle(
+                            fontFamily: 'Livvic',
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF024F3B),
                           ),
                         ),
                       ],
                     ),
                   ),
-                ),
-              ),
 
-              const SizedBox(height: 30),
+                  const SizedBox(height: 20),
 
-              // Upload from gallery button
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton.icon(
-                    onPressed: _pickFromGallery,
-                    icon: const Icon(Icons.photo_library_outlined, size: 24),
-                    label: const Text(
-                      'Upload From Gallery',
-                      style: TextStyle(
-                        fontFamily: 'Kanit',
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF54AF75),
-                      foregroundColor: Colors.white,
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(28),
+                  // Camera viewfinder area
+                  Expanded(
+                    child: Center(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 24),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF484C52).withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: const Color(0xFF54AF75),
+                            width: 3,
+                          ),
+                        ),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            // Camera preview
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(17),
+                              child:
+                                  _isCameraInitialized &&
+                                      _cameraController != null
+                                  ? CameraPreview(_cameraController!)
+                                  : Container(
+                                      color: Colors.black.withOpacity(0.1),
+                                      child: const Center(
+                                        child: CircularProgressIndicator(
+                                          color: Color(0xFF54AF75),
+                                        ),
+                                      ),
+                                    ),
+                            ),
+
+                            // Corner markers
+                            Positioned(
+                              top: 20,
+                              left: 20,
+                              child: _CornerMarker(isTopLeft: true),
+                            ),
+                            Positioned(
+                              top: 20,
+                              right: 20,
+                              child: _CornerMarker(isTopRight: true),
+                            ),
+                            Positioned(
+                              bottom: 20,
+                              left: 20,
+                              child: _CornerMarker(isBottomLeft: true),
+                            ),
+                            Positioned(
+                              bottom: 20,
+                              right: 20,
+                              child: _CornerMarker(isBottomRight: true),
+                            ),
+
+                            // Instruction text
+                            Positioned(
+                              bottom: 60,
+                              left: 30,
+                              right: 30,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                  vertical: 12,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.95),
+                                  borderRadius: BorderRadius.circular(25),
+                                ),
+                                child: const Text(
+                                  'Point your camera at the trash and capture it.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontFamily: 'Kanit',
+                                    fontSize: 14,
+                                    color: Color(0xFF024F3B),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ),
 
-              const SizedBox(height: 20),
+                  const SizedBox(height: 30),
 
-              // Capture button
-              GestureDetector(
-                onTap: _captureImage,
-                child: Container(
-                  width: 70,
-                  height: 70,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                    border: Border.all(
-                      color: const Color(0xFF54AF75),
-                      width: 4,
+                  // Upload from gallery button
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: ElevatedButton.icon(
+                        onPressed: _pickFromGallery,
+                        icon: const Icon(
+                          Icons.photo_library_outlined,
+                          size: 24,
+                        ),
+                        label: const Text(
+                          'Upload From Gallery',
+                          style: TextStyle(
+                            fontFamily: 'Kanit',
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF54AF75),
+                          foregroundColor: Colors.white,
+                          elevation: 2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(28),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                  child: Center(
+
+                  const SizedBox(height: 20),
+
+                  // Capture button
+                  GestureDetector(
+                    onTap: _captureImage,
                     child: Container(
-                      width: 50,
-                      height: 50,
-                      decoration: const BoxDecoration(
+                      width: 70,
+                      height: 70,
+                      decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Color(0xFF54AF75),
+                        color: Colors.white,
+                        border: Border.all(
+                          color: const Color(0xFF54AF75),
+                          width: 4,
+                        ),
+                      ),
+                      child: Center(
+                        child: Container(
+                          width: 50,
+                          height: 50,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Color(0xFF54AF75),
+                          ),
+                        ),
                       ),
                     ),
                   ),
+
+                  const SizedBox(height: 30),
+                ],
+              ),
+            ),
+          ),
+          if (_isClassifying)
+            Positioned.fill(
+              child: AbsorbPointer(
+                absorbing: true,
+                child: Container(
+                  color: Colors.black54,
+                  child: const Center(
+                    child: CircularProgressIndicator(color: Color(0xFF54AF75)),
+                  ),
                 ),
               ),
-
-              const SizedBox(height: 30),
-            ],
-          ),
-        ),
+            ),
+        ],
       ),
     );
   }

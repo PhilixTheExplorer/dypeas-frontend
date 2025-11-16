@@ -24,7 +24,7 @@ class ResultSuccessScreen extends StatelessWidget {
       case 'hazardous':
         return const Color(0xFFC70000); // Red
       default:
-        return const Color(0xFF397800);
+        return const Color(0xFF0070AB);
     }
   }
 
@@ -40,7 +40,7 @@ class ResultSuccessScreen extends StatelessWidget {
       case 'hazardous':
         return 'Hazardous Waste';
       default:
-        return 'Compostable Waste';
+        return 'General Waste';
     }
   }
 
@@ -56,7 +56,7 @@ class ResultSuccessScreen extends StatelessWidget {
       case 'hazardous':
         return 'assets/icons/bins/red_bin.svg';
       default:
-        return 'assets/icons/bins/green_bin.svg';
+        return 'assets/icons/bins/blue_bin.svg';
     }
   }
 
