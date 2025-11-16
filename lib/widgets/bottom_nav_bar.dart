@@ -5,10 +5,10 @@ class BottomNavBar extends StatelessWidget {
   final Function(int) onTap;
 
   const BottomNavBar({
-    Key? key,
+    super.key,
     required this.currentIndex,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class BottomNavBar extends StatelessWidget {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -64,13 +64,12 @@ class _NavBarItem extends StatelessWidget {
   final bool isCenter;
 
   const _NavBarItem({
-    Key? key,
     required this.icon,
     required this.label,
     required this.isSelected,
     required this.onTap,
     this.isCenter = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

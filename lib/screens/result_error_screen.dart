@@ -4,13 +4,12 @@ import 'dart:io';
 class ResultErrorScreen extends StatelessWidget {
   final String imagePath;
 
-  const ResultErrorScreen({Key? key, required this.imagePath})
-    : super(key: key);
+  const ResultErrorScreen({super.key, required this.imagePath});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF9BFFF2).withOpacity(0.3),
+      backgroundColor: const Color(0xFF9BFFF2).withValues(alpha: 0.3),
       body: SafeArea(
         child: Column(
           children: [
@@ -47,7 +46,7 @@ class ResultErrorScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -99,7 +98,7 @@ class ResultErrorScreen extends StatelessWidget {
                         width: 120,
                         height: 120,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFC70000).withOpacity(0.1),
+                          color: const Color(0xFFC70000).withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: const Center(

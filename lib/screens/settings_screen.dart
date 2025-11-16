@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -85,11 +85,10 @@ class _SettingTile extends StatelessWidget {
   final VoidCallback onTap;
 
   const _SettingTile({
-    Key? key,
     required this.icon,
     required this.title,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -103,7 +102,7 @@ class _SettingTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -134,7 +133,7 @@ class _SettingTile extends StatelessWidget {
 
 // Language selection screen
 class LanguageScreen extends StatefulWidget {
-  const LanguageScreen({Key? key}) : super(key: key);
+  const LanguageScreen({super.key});
 
   @override
   State<LanguageScreen> createState() => _LanguageScreenState();
@@ -176,7 +175,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
                   onPressed: () => Navigator.pop(context),
                 ),
               ),
-              
+
               // Settings title
               Positioned(
                 top: 24,
@@ -194,7 +193,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
                   ),
                 ),
               ),
-              
+
               // Language options
               Padding(
                 padding: const EdgeInsets.only(top: 80, left: 24, right: 24),
@@ -234,7 +233,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
                                 : null,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
+                                color: Colors.black.withValues(alpha: 0.1),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),

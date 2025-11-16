@@ -6,7 +6,7 @@ void main() {
 }
 
 class WasteSortingMVP extends StatelessWidget {
-  const WasteSortingMVP({Key? key}) : super(key: key);
+  const WasteSortingMVP({super.key});
 
   @override
   Widget build(BuildContext context) {

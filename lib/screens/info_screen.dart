@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class InfoScreen extends StatelessWidget {
-  const InfoScreen({Key? key}) : super(key: key);
+  const InfoScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -115,13 +115,12 @@ class _WasteInfoCard extends StatelessWidget {
   final List<String> items;
 
   const _WasteInfoCard({
-    Key? key,
     required this.icon,
     required this.title,
     required this.titleColor,
     required this.backgroundColor,
     required this.items,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +130,7 @@ class _WasteInfoCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -144,7 +143,7 @@ class _WasteInfoCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
-              color: backgroundColor.withOpacity(0.15),
+              color: backgroundColor.withValues(alpha: 0.15),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
@@ -155,7 +154,7 @@ class _WasteInfoCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: backgroundColor.withOpacity(0.25),
+                    color: backgroundColor.withValues(alpha: 0.25),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(icon, color: backgroundColor, size: 24),
@@ -180,7 +179,7 @@ class _WasteInfoCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
-              color: backgroundColor.withOpacity(0.95),
+              color: backgroundColor.withValues(alpha: 0.95),
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(16),
                 bottomRight: Radius.circular(16),

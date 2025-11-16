@@ -6,7 +6,7 @@ import './result_error_screen.dart';
 import '../services/roboflow_service.dart';
 
 class ScannerScreen extends StatefulWidget {
-  const ScannerScreen({Key? key}) : super(key: key);
+  const ScannerScreen({super.key});
 
   @override
   State<ScannerScreen> createState() => _ScannerScreenState();
@@ -46,7 +46,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
         }
       }
     } catch (e) {
-      print('Error initializing camera: $e');
+      debugPrint('Error initializing camera: $e');
     }
   }
 
@@ -97,6 +97,10 @@ class _ScannerScreenState extends State<ScannerScreen> {
       // Run the Roboflow model against the captured image
       String? identifiedType = await _identifyTrash(photo.path);
 
+      if (!mounted) {
+        return;
+      }
+
       if (identifiedType != null) {
         // Success - show result
         Navigator.push(
@@ -118,7 +122,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
         );
       }
     } catch (e) {
-      print('Error capturing image: $e');
+      debugPrint('Error capturing image: $e');
     }
   }
 
@@ -130,10 +134,14 @@ class _ScannerScreenState extends State<ScannerScreen> {
       );
 
       if (image != null) {
-        print('Image picked: ${image.path}');
+        debugPrint('Image picked: ${image.path}');
 
         // Run the Roboflow model against the gallery image
         String? identifiedType = await _identifyTrash(image.path);
+
+        if (!mounted) {
+          return;
+        }
 
         if (identifiedType != null) {
           // Success - show result
@@ -156,10 +164,10 @@ class _ScannerScreenState extends State<ScannerScreen> {
           );
         }
       } else {
-        print('No image selected');
+        debugPrint('No image selected');
       }
     } catch (e) {
-      print('Error picking image: $e');
+      debugPrint('Error picking image: $e');
 
       // Show error to user
       if (mounted) {
@@ -233,7 +241,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
                       child: Container(
                         margin: const EdgeInsets.symmetric(horizontal: 24),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF484C52).withOpacity(0.3),
+                          color: const Color(0xFF484C52).withValues(alpha: 0.3),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             color: const Color(0xFF54AF75),
@@ -251,7 +259,9 @@ class _ScannerScreenState extends State<ScannerScreen> {
                                       _cameraController != null
                                   ? CameraPreview(_cameraController!)
                                   : Container(
-                                      color: Colors.black.withOpacity(0.1),
+                                      color: Colors.black.withValues(
+                                        alpha: 0.1,
+                                      ),
                                       child: const Center(
                                         child: CircularProgressIndicator(
                                           color: Color(0xFF54AF75),
@@ -293,7 +303,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
                                   vertical: 12,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.95),
+                                  color: Colors.white.withValues(alpha: 0.95),
                                   borderRadius: BorderRadius.circular(25),
                                 ),
                                 child: const Text(
@@ -408,12 +418,11 @@ class _CornerMarker extends StatelessWidget {
   final bool isBottomRight;
 
   const _CornerMarker({
-    Key? key,
     this.isTopLeft = false,
     this.isTopRight = false,
     this.isBottomLeft = false,
     this.isBottomRight = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

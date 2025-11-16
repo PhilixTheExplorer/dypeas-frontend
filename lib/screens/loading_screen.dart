@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import './main_navigation.dart';
 
 class LoadingScreen extends StatefulWidget {
-  const LoadingScreen({Key? key}) : super(key: key);
+  const LoadingScreen({super.key});
 
   @override
   State<LoadingScreen> createState() => _LoadingScreenState();
@@ -98,7 +98,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
                   borderRadius: BorderRadius.circular(10),
                   child: LinearProgressIndicator(
                     minHeight: 8,
-                    backgroundColor: Colors.white.withOpacity(0.3),
+                    backgroundColor: Colors.white.withValues(alpha: 0.3),
                     valueColor: const AlwaysStoppedAnimation<Color>(
                       Color(0xFF54AF75),
                     ),

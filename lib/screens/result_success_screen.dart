@@ -7,10 +7,10 @@ class ResultSuccessScreen extends StatelessWidget {
   final String wasteType; // 'compostable', 'recyclable', 'general', 'hazardous'
 
   const ResultSuccessScreen({
-    Key? key,
+    super.key,
     required this.imagePath,
     required this.wasteType,
-  }) : super(key: key);
+  });
 
   // Get bin color based on waste type
   Color _getBinColor() {
@@ -63,7 +63,7 @@ class ResultSuccessScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF9BFFF2).withOpacity(0.3),
+      backgroundColor: const Color(0xFF9BFFF2).withValues(alpha: 0.3),
       body: SafeArea(
         child: Column(
           children: [
@@ -100,7 +100,7 @@ class ResultSuccessScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -152,10 +152,10 @@ class ResultSuccessScreen extends StatelessWidget {
                         margin: const EdgeInsets.symmetric(horizontal: 32),
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFEFDC3).withOpacity(0.5),
+                          color: const Color(0xFFFEFDC3).withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: _getBinColor().withOpacity(0.3),
+                            color: _getBinColor().withValues(alpha: 0.3),
                             width: 2,
                           ),
                         ),
@@ -196,7 +196,9 @@ class ResultSuccessScreen extends StatelessWidget {
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: _getBinColor().withOpacity(0.2),
+                                    color: _getBinColor().withValues(
+                                      alpha: 0.2,
+                                    ),
                                     blurRadius: 15,
                                     spreadRadius: 5,
                                   ),

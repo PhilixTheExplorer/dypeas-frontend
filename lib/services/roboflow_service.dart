@@ -30,7 +30,7 @@ class RoboflowException implements Exception {
 
 /// Thrown when the service is not configured with the required values.
 class MissingRoboflowConfigException extends RoboflowException {
-  MissingRoboflowConfigException(String message) : super(message);
+  MissingRoboflowConfigException(super.message);
 }
 
 /// Handles communication with the Roboflow hosted model endpoint.
