@@ -21,6 +21,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.1
 
 flutter:
   uses-material-design: true
@@ -29,6 +30,25 @@ flutter:
     - assets/images/
     - assets/icons/logos/
     - assets/icons/bins/
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/wwlogo.png
+  adaptive_icon_background: "#FFFFFFFF"
+  adaptive_icon_foreground: assets/wwlogo.png
+  min_sdk_android: 21
+  web:
+    generate: true
+    image_path: assets/wwlogo.png
+    background_color: "#FFFFFF"
+    theme_color: "#54AF75"
+  windows:
+    generate: true
+    image_path: assets/wwlogo.png
+  macos:
+    generate: true
+    image_path: assets/wwlogo.png
 
   # fonts:
   #   - family: Kaisei Decol
