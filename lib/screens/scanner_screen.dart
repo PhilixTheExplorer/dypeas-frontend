@@ -58,7 +58,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
     super.dispose();
   }
 
-  Future<String?> _identifyTrash(String imagePath) async {
+  Future<RoboflowClassificationResult?> _identifyTrash(String imagePath) async {
     if (mounted) {
       setState(() {
         _isClassifying = true;
@@ -67,10 +67,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
     try {
       final result = await _roboflowService.classifyImage(imagePath);
-      if (result == null) {
-        return null;
-      }
-      return result.wasteType ?? result.label;
+      return result;
     } on MissingRoboflowConfigException catch (e) {
       _showError(e.message);
     } on RoboflowException catch (e) {
@@ -105,20 +102,22 @@ class _ScannerScreenState extends State<ScannerScreen> {
       final XFile photo = await _cameraController!.takePicture();
 
       // Run the Roboflow model against the captured image
-      String? identifiedType = await _identifyTrash(photo.path);
+      final classification = await _identifyTrash(photo.path);
 
       if (!mounted) {
         return;
       }
 
-      if (identifiedType != null) {
+      if (classification != null) {
         // Success - show result
         await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => ResultSuccessScreen(
               imagePath: photo.path,
-              wasteType: identifiedType,
+              wasteType: classification.wasteType ?? classification.label,
+              predictedLabel: classification.label,
+              confidence: classification.confidence,
             ),
           ),
         );
@@ -174,20 +173,22 @@ class _ScannerScreenState extends State<ScannerScreen> {
       await _cameraController?.pausePreview();
 
       // Run the Roboflow model against the gallery image
-      String? identifiedType = await _identifyTrash(image.path);
+      final classification = await _identifyTrash(image.path);
 
       if (!mounted) {
         return;
       }
 
-      if (identifiedType != null) {
+      if (classification != null) {
         // Success - show result
         await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => ResultSuccessScreen(
               imagePath: image.path,
-              wasteType: identifiedType,
+              wasteType: classification.wasteType ?? classification.label,
+              predictedLabel: classification.label,
+              confidence: classification.confidence,
             ),
           ),
         );

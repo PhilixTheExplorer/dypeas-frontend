@@ -5,11 +5,15 @@ import 'package:flutter_svg/flutter_svg.dart';
 class ResultSuccessScreen extends StatelessWidget {
   final String imagePath;
   final String wasteType; // 'compostable', 'recyclable', 'general', 'hazardous'
+  final String predictedLabel;
+  final double? confidence;
 
   const ResultSuccessScreen({
     super.key,
     required this.imagePath,
     required this.wasteType,
+    required this.predictedLabel,
+    this.confidence,
   });
 
   // Get bin color based on waste type
@@ -60,8 +64,36 @@ class ResultSuccessScreen extends StatelessWidget {
     }
   }
 
+  String _formatPredictedLabel() {
+    final cleaned = predictedLabel.replaceAll('_', ' ').trim();
+    if (cleaned.isEmpty) {
+      return 'Unknown item';
+    }
+
+    final words = cleaned.split(RegExp(r'\s+')).map((word) {
+      if (word.isEmpty) {
+        return word;
+      }
+      final lower = word.toLowerCase();
+      return '${lower[0].toUpperCase()}${lower.substring(1)}';
+    }).toList();
+
+    return words.join(' ');
+  }
+
+  String? _confidenceDescription() {
+    if (confidence == null) {
+      return null;
+    }
+
+    final percentage = (confidence!.clamp(0, 1) * 100).toStringAsFixed(1);
+    return '$percentage% confidence';
+  }
+
   @override
   Widget build(BuildContext context) {
+    final confidenceText = _confidenceDescription();
+
     return Scaffold(
       backgroundColor: const Color(0xFF9BFFF2).withValues(alpha: 0.3),
       body: SafeArea(
@@ -186,6 +218,30 @@ class ResultSuccessScreen extends StatelessWidget {
                             ),
 
                             const SizedBox(height: 16),
+
+                            Text(
+                              'Detected class: ${_formatPredictedLabel()}',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontFamily: 'Kanit',
+                                fontSize: 15,
+                                color: Color(0xFF024F3B),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+
+                            if (confidenceText != null) ...[
+                              const SizedBox(height: 6),
+                              Text(
+                                confidenceText,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontFamily: 'Kanit',
+                                  fontSize: 13,
+                                  color: Color(0xFF5BA516),
+                                ),
+                              ),
+                            ],
 
                             // Bin icon with animation effect
                             Container(
