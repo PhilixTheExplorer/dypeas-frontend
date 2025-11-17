@@ -69,22 +69,55 @@ class RoboflowService {
   final Map<String, String> _labelToWasteType;
 
   static const Map<String, String> _defaultLabelMapping = {
+    // Compostable / organics
+    'bread': 'compostable',
+    'fruit': 'compostable',
+
+    // Recyclables
+    'can': 'recyclable',
+    'cardboard': 'recyclable',
+    'carton': 'recyclable',
+    'glass': 'recyclable',
+    'glass_bottle': 'recyclable',
+    'glass_jars': 'recyclable',
+    'metal': 'recyclable',
+    'paper': 'recyclable',
+    'paper_container': 'recyclable',
+    'plastic_bottle': 'recyclable',
+    'plastic_container': 'recyclable',
+    'plastic_cup': 'recyclable',
+
+    // General waste / landfill
+    'clothes': 'general',
+    'diapers': 'general',
+    'facialmask': 'general',
+    'paper_cup': 'general',
+    'plastic_bag': 'general',
+    'plastic_cutlery': 'general',
+    'plastic_straw': 'general',
+    'rag': 'general',
+    'shoes': 'general',
+    'styrofoam': 'general',
+    'tissue': 'general',
+    'trash': 'general',
+
+    // Hazardous waste
+    'battery': 'hazardous',
+    'bulb': 'hazardous',
+    'e_waste': 'hazardous',
+    'nailpolishbottle': 'hazardous',
+    'tabletcapsule': 'hazardous',
+
+    // Fallback generic labels
     'compostable': 'compostable',
     'organic': 'compostable',
     'food': 'compostable',
     'vegetable': 'compostable',
-    'fruit': 'compostable',
     'recyclable': 'recyclable',
     'plastic': 'recyclable',
-    'glass': 'recyclable',
-    'paper': 'recyclable',
-    'cardboard': 'recyclable',
-    'metal': 'recyclable',
     'general': 'general',
-    'trash': 'general',
     'landfill': 'general',
     'hazardous': 'hazardous',
-    'battery': 'hazardous',
     'chemical': 'hazardous',
     'medical': 'hazardous',
   };
