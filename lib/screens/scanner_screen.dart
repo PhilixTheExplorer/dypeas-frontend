@@ -3,7 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:camera/camera.dart';
 import './result_success_screen.dart';
 import './result_error_screen.dart';
-import '../services/roboflow_service.dart';
+import '../services/dypeas_backend_service.dart';
 
 class ScannerScreen extends StatefulWidget {
   const ScannerScreen({super.key});
@@ -17,14 +17,14 @@ class _ScannerScreenState extends State<ScannerScreen> {
   CameraController? _cameraController;
   List<CameraDescription>? _cameras;
   bool _isCameraInitialized = false;
-  late final RoboflowService _roboflowService;
+  late final DypeasBackendService _backendService;
   bool _isClassifying = false;
   bool _isProcessingCapture = false;
 
   @override
   void initState() {
     super.initState();
-    _roboflowService = RoboflowService();
+    _backendService = DypeasBackendService();
     _initializeCamera();
   }
 
@@ -54,11 +54,11 @@ class _ScannerScreenState extends State<ScannerScreen> {
   @override
   void dispose() {
     _cameraController?.dispose();
-    _roboflowService.dispose();
+    _backendService.dispose();
     super.dispose();
   }
 
-  Future<RoboflowClassificationResult?> _identifyTrash(String imagePath) async {
+  Future<WasteClassificationResult?> _identifyTrash(String imagePath) async {
     if (mounted) {
       setState(() {
         _isClassifying = true;
@@ -66,11 +66,11 @@ class _ScannerScreenState extends State<ScannerScreen> {
     }
 
     try {
-      final result = await _roboflowService.classifyImage(imagePath);
+      final result = await _backendService.classifyImage(imagePath);
       return result;
-    } on MissingRoboflowConfigException catch (e) {
+    } on BackendConfigException catch (e) {
       _showError(e.message);
-    } on RoboflowException catch (e) {
+    } on BackendException catch (e) {
       _showError(e.message);
     } catch (e) {
       _showError('Failed to classify waste. Please try again.');
@@ -101,7 +101,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
       await _cameraController?.pausePreview();
       final XFile photo = await _cameraController!.takePicture();
 
-      // Run the Roboflow model against the captured image
+      // Run the backend classifier against the captured image
       final classification = await _identifyTrash(photo.path);
 
       if (!mounted) {
@@ -172,7 +172,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
       await _cameraController?.pausePreview();
 
-      // Run the Roboflow model against the gallery image
+      // Run the backend classifier against the gallery image
       final classification = await _identifyTrash(image.path);
 
       if (!mounted) {
