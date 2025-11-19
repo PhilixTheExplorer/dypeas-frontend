@@ -145,7 +145,7 @@ class ResultSuccessScreen extends StatelessWidget {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 8),
 
                       // "Trash Identified" header
                       const Text(
@@ -158,7 +158,7 @@ class ResultSuccessScreen extends StatelessWidget {
                         ),
                       ),
 
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 8),
 
                       // Result container with bin icon
                       Container(
@@ -198,7 +198,7 @@ class ResultSuccessScreen extends StatelessWidget {
                               ),
                             ),
 
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 6),
 
                             Text(
                               '${_formatPredictedLabel()} Detected',
@@ -223,6 +223,7 @@ class ResultSuccessScreen extends StatelessWidget {
                                 ),
                               ),
                             ],
+                            const SizedBox(height: 6),
 
                             // Bin icon with animation effect
                             Container(
