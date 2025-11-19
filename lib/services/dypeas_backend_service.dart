@@ -73,48 +73,32 @@ class DypeasBackendService {
   final Duration _timeout;
 
   static const Map<String, String> _defaultLabelMapping = {
+    'battery': 'hazardous',
     'bread': 'compostable',
-    'fruit': 'compostable',
-    'can': 'recyclable',
+    'bulb': 'hazardous',
     'cardboard': 'recyclable',
     'carton': 'recyclable',
+    'clothes': 'general',
+    'e_waste': 'hazardous',
+    'fruit': 'compostable',
     'glass': 'recyclable',
     'glass_bottle': 'recyclable',
     'glass_jars': 'recyclable',
     'metal': 'recyclable',
+    'nailpolishbottle': 'hazardous',
     'paper': 'recyclable',
     'paper_container': 'recyclable',
+    'paper_cup': 'general',
+    'plastic_bag': 'general',
     'plastic_bottle': 'recyclable',
     'plastic_container': 'recyclable',
     'plastic_cup': 'recyclable',
-    'clothes': 'general',
-    'diapers': 'general',
-    'facialmask': 'general',
-    'paper_cup': 'general',
-    'plastic_bag': 'general',
     'plastic_cutlery': 'general',
     'plastic_straw': 'general',
-    'rag': 'general',
-    'shoes': 'general',
     'styrofoam': 'general',
+    'tabletcapsule': 'hazardous',
     'tissue': 'general',
     'trash': 'general',
-    'battery': 'hazardous',
-    'bulb': 'hazardous',
-    'e_waste': 'hazardous',
-    'nailpolishbottle': 'hazardous',
-    'tabletcapsule': 'hazardous',
-    'compostable': 'compostable',
-    'organic': 'compostable',
-    'food': 'compostable',
-    'vegetable': 'compostable',
-    'recyclable': 'recyclable',
-    'plastic': 'recyclable',
-    'general': 'general',
-    'landfill': 'general',
-    'hazardous': 'hazardous',
-    'chemical': 'hazardous',
-    'medical': 'hazardous',
   };
 
   bool get isConfigured => _baseUrl.trim().isNotEmpty;
@@ -208,6 +192,26 @@ class DypeasBackendService {
 
     final normalizedLabel = label.toLowerCase();
     final wasteType = _labelToWasteType[normalizedLabel];
+
+    final existingIndex = candidates.indexWhere(
+      (candidate) => candidate.label.toLowerCase() == normalizedLabel,
+    );
+
+    if (existingIndex == -1) {
+      candidates.insert(
+        0,
+        WasteClassificationCandidate(label: label, confidence: confidence),
+      );
+    } else {
+      final current = candidates.removeAt(existingIndex);
+      candidates.insert(
+        0,
+        WasteClassificationCandidate(
+          label: current.label,
+          confidence: current.confidence ?? confidence,
+        ),
+      );
+    }
 
     return WasteClassificationResult(
       label: label,
