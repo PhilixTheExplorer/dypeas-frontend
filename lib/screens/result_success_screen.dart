@@ -1,15 +1,13 @@
-import 'package:flutter/material.dart';
 import 'dart:io';
-import 'package:flutter_svg/flutter_svg.dart';
 
-import '../services/dypeas_backend_service.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class ResultSuccessScreen extends StatelessWidget {
   final String imagePath;
   final String wasteType; // 'compostable', 'recyclable', 'general', 'hazardous'
   final String predictedLabel;
   final double? confidence;
-  final List<WasteClassificationCandidate> predictions;
 
   const ResultSuccessScreen({
     super.key,
@@ -17,7 +15,6 @@ class ResultSuccessScreen extends StatelessWidget {
     required this.wasteType,
     required this.predictedLabel,
     this.confidence,
-    this.predictions = const <WasteClassificationCandidate>[],
   });
 
   // Get bin color based on waste type
@@ -95,127 +92,12 @@ class ResultSuccessScreen extends StatelessWidget {
     }
 
     final percentage = (value.clamp(0, 1) * 100).toStringAsFixed(1);
-    return '$percentage% confidence';
-  }
-
-  List<WasteClassificationCandidate> _topPredictions() {
-    if (predictions.length <= 5) {
-      return predictions;
-    }
-    return predictions.sublist(0, 5);
-  }
-
-  Widget _buildPredictionList() {
-    final topPredictions = _topPredictions();
-    if (topPredictions.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32.0),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: const Color(0xFF5BA516).withValues(alpha: 0.2),
-            width: 1.5,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Top Predictions',
-              style: TextStyle(
-                fontFamily: 'Kanit',
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF024F3B),
-              ),
-            ),
-            const SizedBox(height: 12),
-            ...List.generate(topPredictions.length, (index) {
-              final candidate = topPredictions[index];
-              final label = _formatLabel(candidate.label);
-              final confidenceText = _confidencePercentage(
-                candidate.confidence,
-              );
-              return Padding(
-                padding: EdgeInsets.only(
-                  bottom: index == topPredictions.length - 1 ? 0 : 8,
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF54AF75).withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Center(
-                        child: Text(
-                          '${index + 1}',
-                          style: const TextStyle(
-                            fontFamily: 'Kanit',
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF024F3B),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            label,
-                            style: const TextStyle(
-                              fontFamily: 'Kanit',
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF024F3B),
-                            ),
-                          ),
-                          if (confidenceText != null)
-                            Text(
-                              confidenceText,
-                              style: const TextStyle(
-                                fontFamily: 'Kanit',
-                                fontSize: 12,
-                                color: Color(0xFF5BA516),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }),
-          ],
-        ),
-      ),
-    );
+    return '$percentage%';
   }
 
   @override
   Widget build(BuildContext context) {
     final confidenceText = _confidenceDescription();
-    final hasPredictions = predictions.isNotEmpty;
 
     return Scaffold(
       backgroundColor: const Color(0xFF9BFFF2).withValues(alpha: 0.3),
@@ -343,7 +225,7 @@ class ResultSuccessScreen extends StatelessWidget {
                             const SizedBox(height: 16),
 
                             Text(
-                              'Detected class: ${_formatPredictedLabel()}',
+                              '${_formatPredictedLabel()} Detected',
                               textAlign: TextAlign.center,
                               style: const TextStyle(
                                 fontFamily: 'Kanit',
@@ -356,7 +238,7 @@ class ResultSuccessScreen extends StatelessWidget {
                             if (confidenceText != null) ...[
                               const SizedBox(height: 6),
                               Text(
-                                confidenceText,
+                                'The system is $confidenceText sure.',
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
                                   fontFamily: 'Kanit',
@@ -425,11 +307,6 @@ class ResultSuccessScreen extends StatelessWidget {
                       ),
 
                       const SizedBox(height: 24),
-
-                      if (hasPredictions) ...[
-                        _buildPredictionList(),
-                        const SizedBox(height: 24),
-                      ],
 
                       // Scan Again button
                       Padding(

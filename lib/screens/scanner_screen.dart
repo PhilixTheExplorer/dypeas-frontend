@@ -118,7 +118,6 @@ class _ScannerScreenState extends State<ScannerScreen> {
               wasteType: classification.wasteType ?? classification.label,
               predictedLabel: classification.label,
               confidence: classification.confidence,
-              predictions: classification.candidates,
             ),
           ),
         );
@@ -190,7 +189,6 @@ class _ScannerScreenState extends State<ScannerScreen> {
               wasteType: classification.wasteType ?? classification.label,
               predictedLabel: classification.label,
               confidence: classification.confidence,
-              predictions: classification.candidates,
             ),
           ),
         );
