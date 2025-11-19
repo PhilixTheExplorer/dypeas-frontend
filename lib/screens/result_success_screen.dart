@@ -104,31 +104,7 @@ class ResultSuccessScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Header with close button
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  const Spacer(),
-                  const Text(
-                    'Trash-Scanner',
-                    style: TextStyle(
-                      fontFamily: 'Livvic',
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF024F3B),
-                    ),
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, size: 28),
-                    color: const Color(0xFF024F3B),
-                  ),
-                ],
-              ),
-            ),
-
+            const SizedBox(height: 24),
             // Scanned image
             Container(
               height: 200,
@@ -153,7 +129,7 @@ class ResultSuccessScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: 24),
 
             // Result card
             Expanded(
@@ -169,7 +145,7 @@ class ResultSuccessScreen extends StatelessWidget {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 12),
 
                       // "Trash Identified" header
                       const Text(
@@ -182,7 +158,7 @@ class ResultSuccessScreen extends StatelessWidget {
                         ),
                       ),
 
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 12),
 
                       // Result container with bin icon
                       Container(

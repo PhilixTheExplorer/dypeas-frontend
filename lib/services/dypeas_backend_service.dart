@@ -59,7 +59,7 @@ class DypeasBackendService {
            baseUrl ??
            const String.fromEnvironment(
              'DYPEAS_BACKEND_URL',
-             defaultValue: 'https://7a6150e559dc.ngrok-free.app',
+             defaultValue: 'https://web-production-9c3ff.up.railway.app',
            ),
        _predictEndpoint = predictEndpoint ?? '/predict',
        _labelToWasteType = labelToWasteType ?? _defaultLabelMapping,
