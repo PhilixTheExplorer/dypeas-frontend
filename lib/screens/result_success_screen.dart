@@ -9,6 +9,51 @@ class ResultSuccessScreen extends StatelessWidget {
   final String predictedLabel;
   final double? confidence;
 
+  static const Map<String, String> _labelWarnings = {
+    'fruit':
+        'Detected fruit. Please ensure it is removed from any plastic packaging before disposing in the bin.',
+    'bread':
+        'Remove plastic wrap or twist ties before composting bread to avoid contamination.',
+    'bulb':
+        'Wrap bulbs to prevent breakage and bring them to a hazardous waste collection site.',
+    'e_waste': 'Electronics contain hazardous components.',
+    'nailpolishbottle':
+        'Nail polish bottles contain chemicals. Keep them sealed and dispose of them via hazardous waste programs.',
+    'glass':
+        'Rinse glass items and remove lids or caps before recycling. Handle carefully to avoid injury.',
+    'glass_bottle':
+        'Rinse glass bottles and remove caps or labels before recycling.',
+    'glass_jars':
+        'Clean glass jars thoroughly and recycle them with lids removed.',
+    'cardboard':
+        'Flatten cardboard boxes and keep them dry so they can be recycled properly.',
+    'carton':
+        'Rinse cartons and fold them flat before recycling to save space.',
+    'paper':
+        'Keep paper clean and dry. Remove any plastic windows or tape when possible.',
+    'paper_container':
+        'Empty and wipe paper containers. Remove plastic linings or lids if possible.',
+    'paper_cup':
+        'Empty liquids, remove the plastic lid, and place only the cup in the correct bin.',
+    'metal':
+        'Rinse metal cans to remove food residue and flatten sharp edges before recycling.',
+    'styrofoam':
+        'Styrofoam is rarely recycled. Break it down and place it in general waste unless local programs accept it.',
+    'trash':
+        'This item belongs in general waste. Double-check if parts can be recycled separately first.',
+  };
+
+  static const Map<String, String> _wasteTypeWarnings = {
+    'hazardous':
+        'Handle hazardous waste with care. Keep it sealed and take it to an approved hazardous waste facility.',
+    'recyclable':
+        'Make sure recyclables are empty, clean, and dry to prevent contaminating the recycling stream.',
+    'compostable':
+        'Remove any stickers, rubber bands, or packaging before composting this item.',
+    'general':
+        'If possible, look for ways to reuse or recycle parts of this item before sending it to landfill.',
+  };
+
   const ResultSuccessScreen({
     super.key,
     required this.imagePath,
@@ -95,9 +140,25 @@ class ResultSuccessScreen extends StatelessWidget {
     return '$percentage%';
   }
 
+  String? _specialHandlingMessage() {
+    final normalizedLabel = predictedLabel.trim().toLowerCase();
+    final labelWarning = _labelWarnings[normalizedLabel];
+    if (labelWarning != null) {
+      return labelWarning;
+    }
+
+    // Keyword-based fallback for compound labels (e.g., "fruit_in_plastic")
+    if (normalizedLabel.contains('fruit')) {
+      return _labelWarnings['fruit'];
+    }
+
+    return _wasteTypeWarnings[wasteType.toLowerCase()];
+  }
+
   @override
   Widget build(BuildContext context) {
     final confidenceText = _confidenceDescription();
+    final specialHandlingMessage = _specialHandlingMessage();
 
     return Scaffold(
       backgroundColor: const Color(0xFF9BFFF2).withValues(alpha: 0.3),
@@ -220,6 +281,43 @@ class ResultSuccessScreen extends StatelessWidget {
                                   fontFamily: 'Kanit',
                                   fontSize: 13,
                                   color: Color(0xFF5BA516),
+                                ),
+                              ),
+                            ],
+
+                            if (specialHandlingMessage != null) ...[
+                              const SizedBox(height: 8),
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFFF4E5),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: const Color(0xFFFFB74D),
+                                    width: 1.2,
+                                  ),
+                                ),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Icon(
+                                      Icons.warning_amber_rounded,
+                                      color: Color(0xFFE65100),
+                                      size: 24,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        specialHandlingMessage,
+                                        style: const TextStyle(
+                                          fontFamily: 'Kanit',
+                                          fontSize: 13,
+                                          color: Color(0xFF5D4037),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
